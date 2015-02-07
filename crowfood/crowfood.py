@@ -239,9 +239,9 @@ def main():
     
     # output everything
     for (root,filepath),includepaths in includes.items():
-        #print((root,filepath),(None,None))
+        print(((root,filepath),(None,None)))
         for root_,filepath_ in includepaths:
-            print((root,filepath),(root_,filepath_))
+            print(((root,filepath),(root_,filepath_)))
             
     
 if __name__ == '__main__':
