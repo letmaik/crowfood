@@ -1,6 +1,8 @@
 from __future__ import print_function, absolute_import
 
 from six.moves import filter
+from io import open # to use encoding kw in Python 2
+
 import os
 from collections import defaultdict
 
