@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     entry_points = {
         'console_scripts': [
-            'cfood = crowfood.crowfood:main',
+            'cfood = crowfood.cli:main',
         ]
     }
 )
