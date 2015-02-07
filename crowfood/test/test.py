@@ -12,7 +12,7 @@ def test():
                 'libb/b.h': ['liba/a.h']}, deps)
 
 def testSearchPath():
-    deps = run('project-a/libb', ['-I', 'project-a'])
+    deps = run('project-a/libb', ['-I', abspath('project-a')])
     check_deps({'b.h': ['liba/a.h'],
                 'b.c': ['b.h']}, deps)
     
@@ -21,12 +21,16 @@ def testMerge():
     deps = run('project-a', ['--merge', 'module'])
     check_deps({'liba/a.c': [],
                 'libb/b.c': ['liba/a.c']}, deps)
-    
+
+def abspath(path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    return os.path.join(here, path)
+
 def run(testpaths, argv=[]):
     if not isinstance(testpaths, list):
         testpaths = [testpaths]
-    here = os.path.abspath(os.path.dirname(__file__))
-    paths = [os.path.join(here, testpath) for testpath in testpaths]
+    
+    paths = list(map(abspath, testpaths))
     args = cli.parseargs(argv + paths)
     return engine.run(args)
 
