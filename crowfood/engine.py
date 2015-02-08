@@ -231,12 +231,13 @@ def run(args):
     
     # return dependencies as ((root,path),(root,path)) tuples
     deps = []
-    dirs = {}
+    dirs = set()
     for (root,filepath),includepaths in includes.items():
         deps.append(((root,filepath),(None,None)))
         
         directory = os.path.dirname(os.path.join(root, filepath))
         if directory not in dirs:
+            dirs.add(directory)
             deps.append(((root,os.path.dirname(filepath)),(None,None)))
         
         for root_,filepath_ in includepaths:
@@ -244,6 +245,7 @@ def run(args):
             
             directory = os.path.dirname(os.path.join(root_, filepath_))
             if directory not in dirs:
+                dirs.add(directory)
                 deps.append(((root_,os.path.dirname(filepath_)),(None,None)))
     return deps            
     
