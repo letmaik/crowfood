@@ -21,3 +21,4 @@ deploy:
   on:
     tags: true
     all_branches: true
+    python: 3.4
