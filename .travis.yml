@@ -5,17 +5,20 @@ python:
   - 3.4
 
 install:
-  - python setup.py sdist 
+  - python setup.py sdist
   - pip install dist/*.tar.gz
+  - pip install coverage
 
 script:
   - cd crowfood/test
-  - nosetests  --with-coverage --cover-package=crowfood
-  - cd ../..
+  - nosetests --with-coverage --cover-package=crowfood
   
 after_success:
-  - pip install coveralls
-  - coveralls
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then
+      pip install coveralls ;
+      coveralls ;
+    fi
+  - cd ../..
   
 deploy:
   provider: pypi
