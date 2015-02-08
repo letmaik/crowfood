@@ -67,6 +67,7 @@ def run(args):
     def get_input_root(path):
         return next(filter(lambda root: root in path, input_roots))
     
+    input_dirs = defaultdict(list)
     for path in args.path:
         if os.path.isfile(path):
             root = get_input_root(path)
@@ -80,6 +81,7 @@ def run(args):
                 filepaths = map(lambda f: os.path.join(base, f), filenames)
                 filepaths = map(lambda p: os.path.relpath(p, root), filepaths)
                 files[root].extend(filepaths)
+                input_dirs[root].append(base)
                 
     # parse the #include's of all files
     quotes = dict({'both': ('["|<]', '["|>]'),
@@ -98,20 +100,20 @@ def run(args):
     includes_roots = dict() # include path -> root
     includes_unique = set(itertools.chain.from_iterable(includes.values()))
     
-    def find_in_root(include, root, include_paths, cache=None):
+    def find_in_root(include, root, include_paths, cache=None, cacheonly=True):
         for include_path in include_paths:
             full_path = os.path.join(include_path, include)
             rel = os.path.relpath(full_path, root)
             if cache:
                 if rel in cache[root]:
                     return rel
-            elif os.path.exists(full_path):
+            if (not cache or not cacheonly) and os.path.exists(full_path):
                 return rel
         return False
     
-    def find_in_roots(include, root_includepaths, cache=False):
+    def find_in_roots(include, root_includepaths, cache=False, cacheonly=True):
         for root, include_paths in root_includepaths:
-            rel = find_in_root(include, root, include_paths, cache)
+            rel = find_in_root(include, root, include_paths, cache, cacheonly)
             if rel:
                 return root, rel
         return False, False
@@ -139,13 +141,7 @@ def run(args):
                 root_path = includes_roots.get(include)
             if not root_path and args.fuzzy:
                 filename = os.path.basename(include)
-                matches = [k for k in includes_roots if os.path.basename(k) == filename]
-                if matches:
-                    if len(matches) > 1:
-                        print('WARNING: fuzzy search for', include, 'lead to multiple candidates:',
-                              matches, 'skipping', file=sys.stderr)
-                    else:
-                        root_path = includes_roots[matches[0]]
+                root_path = find_in_roots(include, input_dirs.items(), files, cacheonly=False)
             if root_path:
                 includes[(root, filepath)].append((root_path[0],root_path[1]))
             else:
