@@ -67,7 +67,8 @@ def run(args):
     def get_input_root(path):
         return next(filter(lambda root: root in path, input_roots))
     
-    input_dirs = defaultdict(list)
+    if args.fuzzy:
+        filemap = defaultdict(list) # filename -> (root,relpath)
     for path in args.path:
         if os.path.isfile(path):
             root = get_input_root(path)
@@ -77,11 +78,13 @@ def run(args):
                 if base in args.ignore_paths:
                     continue
                 root = get_input_root(base)
-                filenames = filter(lambda f: any(f.endswith('.' + ext) for ext in exts), filenames)
+                filenames = list(filter(lambda f: any(f.endswith('.' + ext) for ext in exts), filenames))
                 filepaths = map(lambda f: os.path.join(base, f), filenames)
-                filepaths = map(lambda p: os.path.relpath(p, root), filepaths)
+                filepaths = list(map(lambda p: os.path.relpath(p, root), filepaths))
                 files[root].extend(filepaths)
-                input_dirs[root].append(base)
+                if args.fuzzy:
+                    for filename, filepath in zip(filenames,filepaths):
+                        filemap[filename].append((root,filepath))
                 
     # parse the #include's of all files
     quotes = dict({'both': ('["|<]', '["|>]'),
@@ -100,20 +103,20 @@ def run(args):
     includes_roots = dict() # include path -> root
     includes_unique = set(itertools.chain.from_iterable(includes.values()))
     
-    def find_in_root(include, root, include_paths, cache=None, cacheonly=True):
+    def find_in_root(include, root, include_paths, cache=None):
         for include_path in include_paths:
             full_path = os.path.join(include_path, include)
             rel = os.path.relpath(full_path, root)
             if cache:
                 if rel in cache[root]:
                     return rel
-            if (not cache or not cacheonly) and os.path.exists(full_path):
+            elif os.path.exists(full_path):
                 return rel
         return False
     
-    def find_in_roots(include, root_includepaths, cache=False, cacheonly=True):
+    def find_in_roots(include, root_includepaths, cache=False):
         for root, include_paths in root_includepaths:
-            rel = find_in_root(include, root, include_paths, cache, cacheonly)
+            rel = find_in_root(include, root, include_paths, cache)
             if rel:
                 return root, rel
         return False, False
@@ -126,7 +129,7 @@ def run(args):
         if root:
             includes_roots[include] = root, relpath
     
-    not_found = []
+    not_found = defaultdict(list)
     for (root, filepath), includepaths in list(includes.items()):
         includes[(root, filepath)] = []
         for include in includepaths:
@@ -141,16 +144,28 @@ def run(args):
                 root_path = includes_roots.get(include)
             if not root_path and args.fuzzy:
                 filename = os.path.basename(include)
-                root_path = find_in_roots(include, input_dirs.items(), files, cacheonly=False)
+                if filename in filemap:
+                    res = filemap[filename]
+                    if len(res) > 1:
+                        print('WARNING: ignoring fuzzy result as multiple '
+                              '{} candidates were found (from {}): {}'.\
+                              format(filename, filepath, [p for _,p in res]), 
+                              file=sys.stderr)
+                    else:
+                        root_path = res[0]
             if root_path:
                 includes[(root, filepath)].append((root_path[0],root_path[1]))
             else:
-                not_found.append((include, filepath))
+                not_found[include].append(filepath)
                 
     if not_found:
         print('\nWARNING: some includes could not be found:\n', file=sys.stderr)
-        for include,filepath in not_found:
-            print('{} not found (from {})'.format(include, filepath), file=sys.stderr)
+       
+        for include in sorted(not_found.keys()):
+            print('{} not found'.format(include), file=sys.stderr)
+            if args.verbose:
+                for filepath in sorted(not_found[include]):
+                    print('  from {}'.format(filepath), file=sys.stderr)
     
     # Unify roots when a file was found over multiple roots.
     # This happens when an include search path is given that is above

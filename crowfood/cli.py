@@ -75,6 +75,11 @@ def getParser():
                         action='store_true',
                         )
     
+    parser.add_argument('-v', '--verbose', help='be more verbose', 
+                        dest='verbose',
+                        action='store_true',
+                        )
+    
     return parser
 
 def parseargs(argv):
@@ -127,9 +132,10 @@ def main():
         print(list(external_include_paths.values()))
         sys.exit()
     
-    for dep in sorted(crowfood.engine.run(args)):
-        print(dep)
+    deps = crowfood.engine.run(args)
     
+    for dep in deps:
+        print(dep)    
     
 if __name__ == '__main__':
     main()
