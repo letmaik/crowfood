@@ -209,14 +209,21 @@ def run(args):
             # that is, a.c -> a.h -> a.inc will be picked up, but not
             # a.c -> b.h -> a.inc.
             # Cyclic imports will lead to an error.
-            matches = list(find_matches(base, includepaths))
+            matches = set(find_matches(base, includepaths))
             
             deps = itertools.chain.from_iterable(includes.get(match, []) for match in matches)
-            includes[(root,filepath)] = includepaths + list(deps)
+            includes[(root,filepath)] = list((set(includepaths) | set(deps)) - matches)
             
             for match in matches:
                 if match in includes:
                     del includes[match]
+        
+        # remove file extensions as these don't make sense anymore now
+        newincludes = dict()
+        for (root1,path1),includepaths in includes.items():
+            newincludes[(root1,os.path.splitext(path1)[0])] =\
+                [(root2,os.path.splitext(path2)[0]) for (root2,path2) in includepaths]
+        includes = newincludes
             
     # maybe: replace file extension with .py to make snakefood happy
     
@@ -224,9 +231,19 @@ def run(args):
     
     # return dependencies as ((root,path),(root,path)) tuples
     deps = []
+    dirs = {}
     for (root,filepath),includepaths in includes.items():
         deps.append(((root,filepath),(None,None)))
+        
+        directory = os.path.dirname(os.path.join(root, filepath))
+        if directory not in dirs:
+            deps.append(((root,os.path.dirname(filepath)),(None,None)))
+        
         for root_,filepath_ in includepaths:
             deps.append(((root,filepath),(root_,filepath_)))
+            
+            directory = os.path.dirname(os.path.join(root_, filepath_))
+            if directory not in dirs:
+                deps.append(((root_,os.path.dirname(filepath_)),(None,None)))
     return deps            
     
