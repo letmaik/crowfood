@@ -21,6 +21,12 @@ def testMerge():
     deps = run('project-a', ['--merge', 'module'])
     check_deps({'libb/b': {'liba/a'}}, deps)
 
+def testFuzzy():
+    deps = run('project-a', ['--fuzzy', '--no-include-current'])
+    check_deps({'liba/a.c': {'liba/a.h'},
+                'libb/b.c': {'libb/b.h'},
+                'libb/b.h': {'liba/a.h'}}, deps)
+
 def abspath(path):
     here = os.path.abspath(os.path.dirname(__file__))
     return os.path.join(here, path)
@@ -46,5 +52,5 @@ if __name__ == '__main__':
     test()
     testSearchPath()
     testMerge()
-    
+    testFuzzy()
     

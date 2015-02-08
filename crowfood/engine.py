@@ -137,6 +137,15 @@ def run(args):
                     root_path = root, rel
             if not root_path:
                 root_path = includes_roots.get(include)
+            if not root_path and args.fuzzy:
+                filename = os.path.basename(include)
+                matches = [k for k in includes_roots if os.path.basename(k) == filename]
+                if matches:
+                    if len(matches) > 1:
+                        print('WARNING: fuzzy search for', include, 'lead to multiple candidates:',
+                              matches, 'skipping', file=sys.stderr)
+                    else:
+                        root_path = includes_roots[matches[0]]
             if root_path:
                 includes[(root, filepath)].append((root_path[0],root_path[1]))
             else:
@@ -224,11 +233,7 @@ def run(args):
             newincludes[(root1,os.path.splitext(path1)[0])] =\
                 [(root2,os.path.splitext(path2)[0]) for (root2,path2) in includepaths]
         includes = newincludes
-            
-    # maybe: replace file extension with .py to make snakefood happy
-    
-    
-    
+                
     # return dependencies as ((root,path),(root,path)) tuples
     deps = []
     dirs = set()

@@ -55,6 +55,14 @@ def getParser():
                         action='store_true',
                         )
     
+    parser.add_argument('--fuzzy', help=
+                        'Try to locate all non-found includes by matching '
+                        'with file name only. Note that this may lead to '
+                        'wrong dependencies.',
+                        dest='fuzzy',
+                        action='store_true',
+                        )
+    
     parser.add_argument('-E','--external-root', help=
                         'root directory to use for additional -I include paths for external dependencies'
                         'if not given, then the -I directories become the roots instead',
