@@ -17,7 +17,7 @@ deploy:
   provider: pypi
   user: neothemachine
   password:
-    secure: ""
+    secure: "QL/YehkdkoeKudEkE6OHUTFtYF5mhXN93fMxcEY/LwCLv4IA3a1qpYCcq1RLcSX3qjMG29TuADPNghLrc6Vqb3UfxodKJSF0MhKzbVEYxN3ylKLjGklVkyztb6pRApv32DWnvobTTSgS8Dz7vtZam6wq10cLLBk8r9WL9Cxzd7A="
   on:
     tags: true
     all_branches: true
