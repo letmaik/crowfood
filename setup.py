@@ -14,8 +14,7 @@ setup(
       'Programming Language :: Python :: 3',
       'Operating System :: OS Independent',
     ],
-    packages = find_packages(),
-    include_package_data=True,
+    packages = find_packages(exclude=['crowfood.test']),
     install_requires=['six'],
     entry_points = {
         'console_scripts': [
