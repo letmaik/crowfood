@@ -6,8 +6,18 @@ python:
 
 install:
   - python setup.py sdist 
-  - pip install build/*.tar.gz
+  - pip install dist/*.tar.gz
 
 script:
   - cd crowfood/test
   - nosetests
+  - cd ../..
+  
+deploy:
+  provider: pypi
+  user: neothemachine
+  password:
+    secure: ""
+  on:
+    tags: true
+    all_branches: true
