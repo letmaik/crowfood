@@ -10,8 +10,11 @@ install:
 
 script:
   - cd crowfood/test
-  - nosetests
+  - nosetests  --with-coverage --cover-package=crowfood
   - cd ../..
+  
+after_success:
+  - coveralls
   
 deploy:
   provider: pypi
