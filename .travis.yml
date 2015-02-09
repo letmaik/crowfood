@@ -11,9 +11,7 @@ install:
 
 script:
   - cd crowfood/test
-  - echo $PYTHONPATH
-  - python -c "from __future__ import print_function; import crowfood; print(crowfood.__file__)"
-  - nosetests --with-coverage --cover-package=crowfood
+  - nosetests --with-coverage --cover-package=crowfood --no-path-adjustment
   
 after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then

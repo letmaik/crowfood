@@ -21,7 +21,8 @@ setup(
     entry_points = {
         'console_scripts': [
             'cfood = crowfood.cli:main',
-            'cfood-graph = crowfood.graph:main'
+            'cfood-graph = crowfood.graph:main',
+            'cfood-cluster_regexp = crowfood.cluster_regexp:main'
         ]
     }
 )

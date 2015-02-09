@@ -27,7 +27,7 @@ strict digraph "dependencies" {
 
        node [
            fontsize={fontsize}
-           shape=ellipse
+           shape={shape}
            // style=filled
            // shape=box
        ];
@@ -38,9 +38,10 @@ postfix = '''
 }
 '''
 
-def graph(pairs, write, fontsize, rankdir, size, ratio):
+def graph(pairs, write, fontsize, rankdir, size, ratio, shape):
     "Given (from, to) pairs of (root, fn) files, output a dot graph."
-    write(prefix.format(fontsize=fontsize, rankdir=rankdir, size=size, ratio=ratio))
+    write(prefix.format(fontsize=fontsize, rankdir=rankdir, size=size, ratio=ratio,
+                        shape=shape))
     lines = []
     for (froot, f), (troot, t) in pairs:
         if opts.pythonify_filenames:
@@ -84,13 +85,17 @@ def main():
                       default=10,
                       help="The size of the font to use for nodes.")
     
-    parser.add_option('--rankdir', action='store', choices=['LR','TB'],
+    parser.add_option('--rankdir', action='store',
                       default='LR',
-                      help="The direction of the graph layout (dot only).")
+                      help="The direction of the graph layout (dot only). LR or TB.")
     
     parser.add_option('--size', action='store',
                       default='8,10',
-                      help="The direction of the graph layout (dot only).")
+                      help="Size.")
+    
+    parser.add_option('--shape', action='store',
+                      default='ellipse',
+                      help="Node shape. [ellipse,box,..]")
     
     parser.add_option('--ratio', action='store',
                       default='fill',
