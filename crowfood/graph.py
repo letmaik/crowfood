@@ -114,6 +114,7 @@ def main():
         depends = read_depends(f)
         if opts.redundant:
             depends = eliminate_redundant_depends(depends)
-        graph(depends, sys.stdout.write, opts.fontsize, opts.rankdir, opts.size)
+        graph(depends, sys.stdout.write, opts.fontsize, opts.rankdir, 
+              opts.size, opts.ratio, opts.shape)
 
 
