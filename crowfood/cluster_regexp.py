@@ -1,3 +1,5 @@
+from __future__ import print_function, absolute_import
+
 """
 Cluster dependencies by regular expression.
 """
@@ -6,9 +8,9 @@ Cluster dependencies by regular expression.
 
 import sys
 import re
-from itertools import imap
+from collections import defaultdict
 
-from snakefood.fallback.collections import defaultdict
+from six.moves import map
 from snakefood.depends import read_depends, output_depends
 
 
@@ -21,17 +23,18 @@ def read_clusters(fn):
     "Return a list of cluster regexes read from the file 'fn'."
     f = open(fn, 'rU')
     clusters = []
-    for x in imap(str.strip, f.xreadlines()):
+    for x in map(str.strip, f.xreadlines()):
         if not x:
             continue
-        regex, rename = x.split(' ')
+        ws = x.index(' ')
+        regex, rename = x[:ws], x[ws+1:]
         clusters.append(regex)
         clusters.append(rename)
     return clusters
 
 def main():
     import optparse
-    parser = optparse.OptionParser(__doc__.strip())
+    parser = optparse.OptionParser()
     
     parser.add_option('-f', '--from-file', action='store',
                       help="Read cluster list from the given filename.")
