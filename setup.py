@@ -4,7 +4,7 @@ setup(
     name = 'crowfood',
     description = 'C/C++ dependency graphing using snakefood',
     long_description = open('README.rst').read(),
-    version = '0.4.0',
+    version = '0.4.1',
     author = 'Maik Riechert',
     author_email = 'maik.riechert@arcor.de',
     url = 'https://github.com/neothemachine/crowfood',
