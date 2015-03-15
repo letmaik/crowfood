@@ -40,11 +40,11 @@ which is then visualized with ``dot`` itself and saved to a pdf file:
 
     cfood /libab | sfood-graph | dot -Tpdf > simple.pdf
     
-crowfood can handle many folder layouts and will output warnings if it can't find #include's.
+crowfood can handle many folder layouts and will output warnings if it can't find ``#include``'s.
 Run ``cfood --help`` to see all options regarding folder layout and include paths.
 
 *TIP*: As a quick fix or to get started with bigger projects, 
-use ``--fuzzy`` to let crowfood search for ``#include``ed files purely by their filename
+use ``--fuzzy`` to let crowfood search for ``#include`` files purely by their filename
 and ignore folder structure.
 
 Grouping/Clustering
