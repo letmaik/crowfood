@@ -11,6 +11,12 @@ def test():
     check_deps({'liba/a.c': {'liba/a.h'},
                 'libb/b.c': {'libb/b.h'},
                 'libb/b.h': {'liba/a.h'}}, deps)
+    
+def test2():
+    deps = run('project-b')
+    check_deps({'a.c': {'ab/a.h'},
+                'b.c': {'ab/b.h'},
+                'ab/b.h': {'ab/a.h'}}, deps)
 
 def testSearchPath():
     deps = run('project-a/libb', ['-I', abspath('project-a')])
@@ -20,6 +26,10 @@ def testSearchPath():
 def testMerge():
     deps = run('project-a', ['--merge', 'module'])
     check_deps({'libb/b': {'liba/a'}}, deps)
+    
+def testMerge2():
+    deps = run(['project-b'], ['--merge', 'module'])
+    check_deps({'b': {'a'}}, deps)
 
 def testFuzzy():
     deps = run('project-a', ['--fuzzy', '--no-include-current'])
@@ -49,8 +59,10 @@ def check_deps(expected, actual):
     assert expected == act, 'dependencies mismatch: \nactual:\n{}\n\nexpected:\n{}'.format(dict(act),expected)
     
 if __name__ == '__main__':
-    test()
-    testSearchPath()
-    testMerge()
-    testFuzzy()
+    #test()
+    #test2()
+    #testSearchPath()
+    #testMerge()
+    testMerge2()
+    #testFuzzy()
     

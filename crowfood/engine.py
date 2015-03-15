@@ -237,6 +237,11 @@ def run(args):
             for match in matches:
                 if match in includes:
                     del includes[match]
+                # move old references to the merged module
+                for k, includepaths in includes.items():
+                    if match in includepaths:
+                        includes[k] = [(root,filepath) if dep == match else dep
+                                       for dep in includepaths]
         
         # remove file extensions as these don't make sense anymore now
         newincludes = dict()
